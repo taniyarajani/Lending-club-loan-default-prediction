@@ -13,3 +13,5 @@ Steps involved in the analysis and prediction of loan deafult -
 2. Missing Value Imputation
 3. Build Decision Trees, Random Forest and GBM to predict default
 4. Profit curve analysis to evaluate potential customers to target for maximum profit
+
+This repository contains the data used, dictionary and the analysis.
