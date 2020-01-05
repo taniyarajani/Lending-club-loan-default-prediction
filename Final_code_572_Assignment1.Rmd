@@ -1,11 +1,10 @@
 ---
-title: "Final_final_code"
+title: "Final_code"
 output: html_document
 ---
-#Author: Taniya Rajani, Yuvika Rajrana and Pragna Venigella
+#Author: Taniya Rajani
 
 ```{r}
-# setwd("D:/IDS 572/Assgn 1/lcData6m")
 library(ggplot2)
 library(dplyr)
 library(lubridate)
@@ -16,9 +15,6 @@ library(tidyverse)
 library(rpart)
 rm(list = ls(all.names = TRUE))
 ```
-# Question 2
-## Question 2 (a).(i). 
-
 ```{r}
 #Read lending club dataset
 lcdf <- read.csv("D:/IDS 572/Assgn 1/lcData6m.csv", header = TRUE, sep = ",")
@@ -56,7 +52,6 @@ ggplot(lcdf,aes(x = sub_grade, fill = loan_status))+geom_bar()+ggtitle("Default 
 ggsave("Default variation with Subgrade.png", width = 5, height = 5)
 ```  
 
-## Question 2 (a).(ii). 
 ```{r}
 #No. of loans for each grade
 ggplot(lcdf,aes(x = grade, fill = grade))+geom_bar()+geom_text(aes(label=..count..),stat="count",position=position_stack())+ggtitle("No. of loans for each grade")+theme(plot.title = element_text(hjust = 0.5))
@@ -74,8 +69,6 @@ ggplot(lcdf) + geom_boxplot(mapping  = aes(x = sub_grade, y = int_rate)) + facet
 ggsave("Interest rate variation with subgrade.png", width = 5, height = 5)
 ```  
 
-
-## Question 2 (a).(iii). 
 ```{r}
 summary(lcdf$purpose)
 #purpose for borrowing money
@@ -104,7 +97,6 @@ lcdf %>%
 ggplot(lcdf,aes(x = purpose, fill = loan_status))+geom_bar()+ggtitle("Default variation with purpose")+theme(plot.title = element_text(hjust = 0.5))
 ggsave("Default variation with purpose.png", height = 5, width = 5)
 ```
-## Question 2 (a).(iv).
 
 ```{r}
 # calculate annual return
@@ -160,7 +152,6 @@ lcdf %>% group_by(grade) %>% summarise(nLoans=n(), defaults=sum(loan_status=="Ch
 lcdf %>% group_by(sub_grade) %>% summarise(nLoans=n(), defaults=sum(loan_status=="Charged Off"), default_rate = (sum(loan_status=="Charged Off")/n()),                                   avgInterest= mean(int_rate), stdInterest=sd(int_rate),                                      avgLoanAMt=mean(loan_amnt), avgPmnt=mean(total_pymnt), avgactualRet=mean(actual_annRet), stdactualRet=sd(actual_annRet), minactualRet=min(actual_annRet),                                       maxactualRet=max(actual_annRet))
 ```
 
-## Question 2 (a).(v).
 ```{r}
 #Derived attribute: proportion of satisfactory bankcard accounts 
 lcdf$propSatisBankcardAccts <- ifelse(lcdf$num_bc_tl>0, lcdf$num_bc_sats/lcdf$num_bc_tl, 0)
@@ -181,7 +172,7 @@ lcdf$ratio_fund_income <- lcdf$funded_amnt/lcdf$annual_inc
 lcdf$cur_bal_open_acc <- lcdf$tot_cur_bal/lcdf$open_acc
 
 ```
-## Question 2 (b). 
+
 ```{r}
 
 #Drop variables with all empty values
@@ -272,7 +263,7 @@ d[is.na(d)] <- 0
 lcdf$num_tl_120dpd_2m <- d
 ```
 
-#Q3. Consider the potential for data leakage. You do not want to include variables in your model which may not be available when applying the model; that is, some data may not be available for new loans before they are funded.
+# We do not want to include variables in your model which may not be available when applying the model; that is, some data may not be available for new loans before they are funded. (leakage variables)
 ```{r}
 #dropping leakage variable
 drop <- c("pymnt_plan","last_pymnt_d", "last_pymnt_amnt", "annRet", "annRet_percentage", "avgRet","actual_annRet","actual_annRet_percentage","funded_amnt_inv", "hardship_flag","earliest_cr_line", "application_type", "better_issue_d", "better_last_pymnt_d", "term", "out_prncp","out_prncp_inv", "policy_code", "issue_d","title", "debt_settlement_flag", "loan_duration", "recoveries", "chargeoff_within_12_mths", "collection_recovery_fee", "addr_state", "zip_code","num_tl_120dpd_2m")
@@ -319,7 +310,7 @@ colnames(lcdf1_Q6b)[colnames(lcdf1_Q6b)=="lcdf.funded_amnt"] <- "funded_amnt_new
 
 
 
-# Question 4 - Develop decision tree models to predict default.
+# Develop decision tree models to predict default.
 ```{r}
 #Decision tree model
 library(rpart)
@@ -408,7 +399,7 @@ mean(predict(lcDT1p,lcdf1Tst, type='class') ==lcdf1Tst$loan_status)
 
 ```{r}
 
-# Question 5 - Develop a random forest model.
+# Develop a random forest model.
 
 
 #Building random forest model
@@ -480,7 +471,7 @@ perfLift_rfTst=performance(prediction(predict(rfModel2,lcdf1Tst, type="prob")[,2
 plot(perfLift_rfTst)
 
 ```
-##Question 5 (i). 
+## 
 Paramteres to experiment with - 
   Number of trees, mtry(No. of variable to choose at every split)
 Above two are the key parameters for random forest model apart from the common parameters for tree based models e.g. depth, child node etc. 
@@ -507,12 +498,11 @@ legend('bottomright', c('DecisionTree-1', 'RandomForest'), lty=1, col=c('red', '
 
 ```
 
-## Q5 Continue
+## Continue
 
 We would prefer Random Forest over Decision Trees because the idea behind Random Forest is bagging which will help to reduce bias and increase the variance. It gives importance to weak predictors as well by randomly subsetting the variables at each split. Random Forest is able to catch interactions from weak predictors as well. The performance of Random Forest is significantly higher than our Decision Tree model for above stated reasons. Also, as it can be seen in above plot, Random Forest is quick and more accurate in achieving better true positive rate (sensitivity), which can be beneficial for us.
 
-#Question 6 - 
-
+#Profit curve analysis
 ```{r}
 
 lcdf_Q6_FullyPaid <- filter(lcdf_returns, lcdf$loan_status== "Fully Paid")
@@ -525,7 +515,7 @@ avgRet_ChargedOff <- mean(lcdf_Q6_ChargedOff$actual_annRet)
 #-0.085
 three_year_loss_ChargedOff <- avgRet_ChargedOff*3
 ```
-# Question.6.(A)
+
 
 #using table_dt (confusion matrix of decision tree)
 
@@ -669,7 +659,7 @@ With 30% threshold
 Total benefit (profit from fully paid + saving from charged off correct prediction) is ~60.2m
 Total Loss from wrong prediction is ~21.2m
 
-##Question 6. (b).
+
 
 #Decision tree best model
 
